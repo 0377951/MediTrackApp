@@ -10,9 +10,24 @@ public class Hospital implements AdmissionSubject {
 
     private final List<AdmissionObserver> observers = new ArrayList<>();
     private final String hospitalName;
+    private RiskCalculationStrategy riskStrategy;
 
     public Hospital(String hospitalName) {
         this.hospitalName = hospitalName;
+    }
+
+    /**
+     * Task 3 challenge — combine Observer + Strategy. Inject the risk
+     * algorithm at construction so the hospital can compute the score
+     * itself before fanning out to observers.
+     */
+    public Hospital(String hospitalName, RiskCalculationStrategy riskStrategy) {
+        this.hospitalName = hospitalName;
+        this.riskStrategy = riskStrategy;
+    }
+
+    public void setRiskStrategy(RiskCalculationStrategy riskStrategy) {
+        this.riskStrategy = riskStrategy;
     }
 
     @Override
@@ -38,5 +53,21 @@ public class Hospital implements AdmissionSubject {
     public void admitPatient(String patientName, int riskScore) {
         System.out.println("[" + hospitalName + "] Admitting: " + patientName);
         notifyObservers(patientName, riskScore);
+    }
+
+    /**
+     * Task 3 challenge — admit a patient by computing the risk score with
+     * the configured strategy first, then notifying observers. Combines the
+     * Strategy and Observer patterns.
+     *
+     * @throws IllegalStateException if no strategy has been configured
+     */
+    public void admitPatient(String patientName, double temperatureC, int age) {
+        if (riskStrategy == null) {
+            throw new IllegalStateException(
+                "No RiskCalculationStrategy configured for hospital: " + hospitalName);
+        }
+        int score = riskStrategy.calculateRisk(temperatureC, age);
+        admitPatient(patientName, score);
     }
 }
