@@ -1,42 +1,29 @@
-public class Patient {
+public abstract class Patient {
 
-    String  name;
-    int     age;
-    double  temperatureC;
-    String  bloodType;
-    boolean isAdmitted;
+    protected String name;
+    protected int    age;
+    protected double temperatureC;
 
-    public Patient(String name, int age, double temperatureC, String bloodType, boolean isAdmitted) {
-        this.name         = name;
-        this.age          = age;
-        this.temperatureC = temperatureC;
-        this.bloodType    = bloodType;
-        this.isAdmitted   = isAdmitted;
+    public Patient(String name, int age, double temperatureC) {
+        this.name = name; this.age = age; this.temperatureC = temperatureC;
     }
 
-    public String assessRisk() {
-        if (temperatureC >= 39.5) return "HIGH";
-        if (temperatureC >= 37.5) return "MODERATE";
-        return "LOW";
+    // Abstract: each patient type defines its own alert threshold
+    public abstract double getAlertTemperatureThreshold();
+
+    // Concrete: shared by all patient types
+    public boolean needsAlert() {
+        return this.temperatureC >= getAlertTemperatureThreshold();
     }
 
     public void printSummary() {
-        System.out.println("--- Patient Summary ---");
-        System.out.println("Name:     " + name);
-        System.out.println("Age:      " + age);
-        System.out.println("Temp:     " + temperatureC + "°C");
-        System.out.println("Blood:    " + bloodType);
-        System.out.println("Risk:     " + assessRisk());
-        System.out.println("Admitted: " + isAdmitted);
+        System.out.println("=== " + getPatientType() + " ===");
+        System.out.println("Name: " + name + " | Age: " + age
+            + " | Temp: " + temperatureC + " | Alert: " + needsAlert());
+        System.out.println("Treatment: " + getTreatmentProtocol());
     }
 
-    public static void main(String[] args) {
-        Patient p1 = new Patient("Maria Santos", 45, 38.9, "O+", true);
-        Patient p2 = new Patient("Ahmad Razali", 72, 37.1, "A-", false);
-        Patient p3 = new Patient("Ethan Smith",  28, 36.6, "B+", false);
+    public abstract String getPatientType();
 
-        p1.printSummary();
-        p2.printSummary();
-        p3.printSummary();
-    }
+    public abstract String getTreatmentProtocol();
 }
